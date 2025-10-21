@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <title>分镜脚本预览</title>
+    <style>
+      body {
+        font-family: "Noto Sans SC", "PingFang SC", sans-serif;
+        margin: 0;
+        padding: 0;
+        background: #121214;
+        color: #f4f4f5;
+      }
+      header {
+        padding: 32px 48px;
+        background: #1d1d20;
+        border-bottom: 1px solid #2a2a2e;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 28px;
+      }
+      header p {
+        margin: 8px 0 0;
+        color: #a1a1aa;
+      }
+      main {
+        padding: 32px 48px 64px;
+      }
+      .shot {
+        background: #1a1a1e;
+        border: 1px solid #27272a;
+        border-radius: 16px;
+        margin-bottom: 32px;
+        overflow: hidden;
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.35);
+      }
+      .shot-header {
+        padding: 20px 28px;
+        border-bottom: 1px solid #2c2c32;
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+      }
+      .shot-header h2 {
+        margin: 0;
+        font-size: 22px;
+      }
+      .shot-header span {
+        color: #71717a;
+      }
+      .shot-body {
+        display: grid;
+        grid-template-columns: minmax(0, 400px) minmax(0, 1fr);
+        gap: 0;
+      }
+      .shot-image img {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
+      }
+      .shot-image {
+        background: #0b0b0f;
+      }
+      .shot-details {
+        padding: 24px 28px;
+        display: grid;
+        gap: 16px;
+      }
+      .detail {
+        background: #111117;
+        border-radius: 12px;
+        padding: 16px 20px;
+        border: 1px solid #1f1f26;
+      }
+      .detail h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        color: #a1a1aa;
+        letter-spacing: 0.02em;
+      }
+      .detail p {
+        margin: 0;
+        line-height: 1.6;
+        white-space: pre-wrap;
+      }
+      .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .tag {
+        background: rgba(99, 102, 241, 0.16);
+        border: 1px solid rgba(129, 140, 248, 0.35);
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 14px;
+      }
+      footer {
+        padding: 24px 48px;
+        color: #71717a;
+        font-size: 14px;
+        border-top: 1px solid #1f1f25;
+        background: #151519;
+      }
+      .placeholder {
+        padding: 40px;
+        text-align: center;
+        color: #71717a;
+      }
+      @media (max-width: 980px) {
+        .shot-body {
+          grid-template-columns: 1fr;
+        }
+        .shot-image {
+          order: 2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>分镜脚本预览</h1>
+      <p>共 {{ storyboard.shots|length }} 个镜头 · 生成时间 {{ generated_at }}</p>
+    </header>
+    <main>
+      {% for shot in storyboard.shots %}
+      <section class="shot">
+        <div class="shot-header">
+          <h2>镜头 {{ shot.index }} · {{ shot.title }}</h2>
+          <span>{{ shot.shot_type }}</span>
+        </div>
+        <div class="shot-body">
+          <div class="shot-image">
+            {% if shot.image_path %}
+              <img src="{{ 'images/' ~ shot.image_path.name }}" alt="Shot {{ shot.index }}" />
+            {% else %}
+              <div class="placeholder">暂无图像</div>
+            {% endif %}
+          </div>
+          <div class="shot-details">
+            <div class="detail">
+              <h3>画面概述</h3>
+              <p>{{ shot.summary }}</p>
+            </div>
+            <div class="detail">
+              <h3>视觉细节</h3>
+              <p>{{ shot.visuals }}</p>
+            </div>
+            {% if shot.dialogue %}
+            <div class="detail">
+              <h3>对白</h3>
+              <p>{{ shot.dialogue }}</p>
+            </div>
+            {% endif %}
+            <div class="detail">
+              <h3>图像提示词</h3>
+              <p>{{ shot.image_prompt }}</p>
+            </div>
+            {% if shot.notes %}
+            <div class="detail">
+              <h3>备注</h3>
+              <p>{{ shot.notes }}</p>
+            </div>
+            {% endif %}
+            {% if shot.characters %}
+            <div class="detail">
+              <h3>角色</h3>
+              <div class="tag-list">
+                {% for character in shot.characters %}
+                  <span class="tag">{{ character }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+      {% endfor %}
+    </main>
+    <footer>
+      使用 Qwen2.5 生成分镜脚本，Nano Banana 渲染图像。可通过调整 seed、LoRA 与 embedding 保障角色一致性。
+    </footer>
+  </body>
+</html>
